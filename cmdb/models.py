@@ -4,9 +4,11 @@ from django.contrib.auth.models import User
 class BaseModel(models.Model):
     name = models.CharField(max_length=32)
     remark = models.TextField()
+
     class Meta:
         abstract = True
-
+        ordering = ['id']
+        unique_together = ('name',)
 
 class Idc(BaseModel):
     address = models.CharField(max_length=100)
@@ -30,8 +32,7 @@ class Idc(BaseModel):
         return res
 
 
-    class Meta:
-        ordering = ['id']
+
 
 
 class Rack(BaseModel):
@@ -70,8 +71,6 @@ class Server(BaseModel):
     daq = models.TextField(default='', null=True, blank=True, verbose_name='数据采集')
     status = models.IntegerField(default=1, choices=STATUS, verbose_name='运行状态')
 
-    class Meta:
-        ordering = ['id']
 
     @property
     def to_dict(self):
@@ -85,5 +84,5 @@ class Server(BaseModel):
         return res
 
 
-    def __str__(self):
-        return self.name
+def __str__(self):
+    return self.name

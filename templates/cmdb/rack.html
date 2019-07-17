@@ -112,7 +112,7 @@
 
         $('#create_in').click(function () {
             var name = $('#name').val()
-            var idc_id = $('#idc_id option:selected').attr('id')
+            var idc_id = $('#idc_id option:selected').attr('id').trim()
             var numb = $('#numb').val()
             var size = $('#size').val()
             var remark= $('#remake').val()
@@ -126,13 +126,15 @@
                 data: data, // 前端传给后端的数据
                 dataType: "json",
                 success: function(result){ // 后端返回的数据
-                    if (result.status == 1) {
+                   if (result.status == 0) {
                         location.reload()
                     }
-                    else {
-                        console.log('创建失败')
+                    else if (result.status == 1){
+                        alert('请勿重复创建')
                     }
-
+                    else {
+                        alert('系统错误')
+                    }
                 },
                 error: function(){
                     //显示错误信息
@@ -142,7 +144,7 @@
 
     //删除表单数据
         $('.delete_btn').click(function () {
-            var id = $(this).attr('id')
+            var id = $(this).attr('id').trim()
             type = 'DELETE' // GET,POST,DELETE,PUT, ...
             url = '/cmdb/racks/' + id
             data = {}
@@ -163,7 +165,7 @@
 
     //修改表单
        $('.edit_btn').click(function () {
-            var id = $(this).parents('tr').children('td').eq(0).text()
+            var id = $(this).parents('tr').children('td').eq(0).text().trim()
             var name = $(this).parents('tr').children('td').eq(1).text()
             var idc_id = $(this).parents('tr').children('td').eq(2).text()
             var numb = $(this).parents('tr').children('td').eq(4).text()
@@ -188,7 +190,7 @@
         $('#edit_in').click(function () {
             var id = $('#id_edit').val()
             var name = $('#name_edit').val()
-            var idc_id = $('#idc_id_edit option:selected').attr('id')
+            var idc_id = $('#idc_id_edit option:selected').attr('id').trim()
             var numb= $('#numb_edit').val()
             var size= $('#size_edit').val()
             var remark= $('#remark_edit').val()
@@ -203,8 +205,15 @@
                 data: data, // 前端传给后端的数据
                 dataType: "json",
                 success: function(data){ // 后端返回的数据
-                    console.log(data)
-                    location.reload()
+                    if (data.status == 0){
+                        location.reload()
+                    }
+                    else if (data.status == 1){
+                        alert('名称重复')
+                    }
+                    else {
+                        alert('系统错误')
+                    }
                 },
                 error: function(){
                     //显示错误信息
