@@ -1,0 +1,221 @@
+
+{% extends 'base.html' %}
+<!-- Django 版本 {{ version }} -->
+{% block content %}
+
+    {% include 'cmdb/modal_rack.html' %}
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active"> 机柜</li>
+    </ol>
+
+    <div style="border: none; margin-top: 20px;border:0;">
+        <div class="col-lg-4" role="group" aria-label="...">
+            <button id="create_btn" type="button" class="btn btn-primary dropdown-toggle" style=" margin-left: 15px">注册机柜</button>
+        </div>
+        <div class="col-lg-offset-4" style="width: 300px">
+            <div class="input-group">
+                <input id="search" type="text" class="form-control"  placeholder="Search for...">
+                <span class="input-group-btn">
+                <button  id="search_btn" class="btn btn-default"  style="width: 100px;" type="button">Go!</button>
+                </span>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+    </div>
+
+    <div class="panel panel-default" style="border: none">
+        <table class="table" ; style="margin-left: 30px ;margin-top: 20px">
+
+        <tr style="background-color: aqua">
+            <th>id</th>
+            <th>机柜名</th>
+            <th>所属机房</th>
+            <th>主机数</th>
+            <th>编号</th>
+            <th>U型</th>
+            <th>备注</th>
+            <th>操作</th>
+        </tr>
+            {% for obj in paginator_data %}
+                <tr>
+                        <td><a href="/cmdb/racks/{{ obj.id }}">{{ obj.id }}</a></td>
+                        <td>{{ obj.name }}</td>
+                        <td>{{ obj.idc.name }}</td>
+                        <td>
+                        {% if  obj.server.count  != 0 %}
+                            <a href="/cmdb/servers/?rack_id={{ obj.id }}">{{ obj.server.count }}</a>
+                        {% else %}
+                            {{ obj.server.count }}
+                        {% endif %}
+                        </td>
+                        <td>{{ obj.numb }}</td>
+                        <td>{{ obj.size }}</td>
+                        <td>{{ rack.remark }}</td>
+                        <td><button class="delete_btn btn btn-warning dropdown-toggle" id="{{ obj.id }}" >删除</button>
+                        <button class="edit_btn btn btn-warning dropdown-toggle" id="{{ obj.id }}"  >修改</button>
+                        </td>
+
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+
+    <div style="margin-left: 30px">
+        {% if paginator_data.has_pervious %}
+            <a class="paginator" href='?page={{ paginator_data.pervious_page_number }}&search={{ search }}'><span>上一页</span></a>
+        {% endif %}
+
+        {% for page in  paginator_data.paginator.page_range%}
+            {% if paginator_data.number == page %}
+                <span id="current_page">{{ page }}</span>
+            {% else %}
+                <a class="paginator" href='?page={{ page }}&search={{ search }}' title='{{ page }}'><span>{{ page }}</span></a>
+            {% endif %}
+        {% endfor %}
+
+        {% if paginator_data.has_next %}
+            <a class="paginator" href='?page={{ paginator_data.next_page_number }}&search={{ search }}'><span>下一页</span></a>
+        {% endif %}
+
+    </div>
+
+
+
+      <!--jquery -->
+    <script >
+        $.ajax({
+            type: 'GET',
+            url: '/cmdb/api_idc',
+            data: {}, // 前端传给后端的数据
+            dataType: "json",
+            success: function(result){ // 后端返回的数据
+                data = result.data
+                options = {}
+                for (obj of data) {
+                    option = '<option id=' + obj.id + '>' + obj.name + '</option>'
+                    options += option
+                }
+                $('#idc_id').append(options)
+                $('#create_modal').attr('select_options',options)
+            },
+            error: function(){
+                //显示错误信息
+            },
+         })
+
+
+        //创建表单
+        $('#create_btn').click(function () {
+            $('#create_modal').modal()
+        })
+
+        $('#create_in').click(function () {
+            var name = $('#name').val()
+            var idc_id = $('#idc_id option:selected').attr('id')
+            var numb = $('#numb').val()
+            var size = $('#size').val()
+            var remark= $('#remake').val()
+
+            type = 'POST' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/racks/'
+            data = {name:name,idc_id:idc_id, numb:numb, size:size, remark:remark}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(result){ // 后端返回的数据
+                    if (result.status == 1) {
+                        location.reload()
+                    }
+                    else {
+                        console.log('创建失败')
+                    }
+
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //删除表单数据
+        $('.delete_btn').click(function () {
+            var id = $(this).attr('id')
+            type = 'DELETE' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/racks/' + id
+            data = {}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(data){ // 后端返回的数据
+                    console.log(data)
+                    location.reload()
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //修改表单
+       $('.edit_btn').click(function () {
+            var id = $(this).parents('tr').children('td').eq(0).text()
+            var name = $(this).parents('tr').children('td').eq(1).text()
+            var idc_id = $(this).parents('tr').children('td').eq(2).text()
+            var numb = $(this).parents('tr').children('td').eq(4).text()
+            var size = $(this).parents('tr').children('td').eq(5).text()
+            var remark = $(this).parents('tr').children('td').eq(6).text()
+            //options = document.getElementById('idc_id').options
+            options = $('#create_modal').attr('select_options')
+            $('#idc_id_edit').empty()
+            $('#idc_id_edit').append(options)
+            document.getElementById("id_edit").value =id
+            document.getElementById("name_edit").value =name
+            document.getElementById("idc_id_edit").value =idc_id
+            document.getElementById("numb_edit").value =numb
+            document.getElementById("size_edit").value =size
+            document.getElementById("remark_edit").value =remark
+            $('#edit_modal').modal()
+       })
+
+
+
+
+        $('#edit_in').click(function () {
+            var id = $('#id_edit').val()
+            var name = $('#name_edit').val()
+            var idc_id = $('#idc_id_edit option:selected').attr('id')
+            var numb= $('#numb_edit').val()
+            var size= $('#size_edit').val()
+            var remark= $('#remark_edit').val()
+            console.log(idc_id)
+            type = 'PUT' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/racks/' + id
+            console.log(url)
+            data = {name:name, idc_id:idc_id, numb:numb, size:size, remark:remark}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(data){ // 后端返回的数据
+                    console.log(data)
+                    location.reload()
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //search
+    $('#search_btn').click(function () {
+        var search = $('#search').val()
+        window.location.href = '/cmdb/racks/?search='+search
+    })
+    </script>
+{% endblock %}

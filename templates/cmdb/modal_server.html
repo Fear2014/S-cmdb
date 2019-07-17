@@ -1,0 +1,70 @@
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="create_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					注册表
+				</h4>
+			</div>
+			<div class="modal-body">
+				主机名 : <input id="name" class="form-control" type="text" > <br>
+                所属机柜 : <select id="rack_id" class="form-control"></select> <br>
+                CPU : <input id="cpu" class="form-control" type="text" > <br>
+                内存（M） : <input id="memory" class="form-control" type="text" > <br>
+                磁盘（G） : <input id="disk" class="form-control" type="text" > <br>
+                IP : <input id="ip" class="form-control" type="text" > <br>
+                业务线 : <input id="business" class="form-control" type="text" > <br>
+                备注 : <input id="remark" class="form-control" type="text" > <br>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button id="create_in" type="button" class="btn btn-primary">
+					注册
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					表单
+				</h4>
+			</div>
+			<div class="modal-body">
+                ID : <input id="id_edit" class="form-control" type="text" readonly="readonly"> <br>
+				主机名 : <input id="name_edit" class="form-control" type="text" > <br>
+                所属机柜 : <select id="rack_id_edit" class="form-control"></select> <br>
+                CPU : <input id="cpu_edit" class="form-control" type="text" > <br>
+                内存（M） : <input id="memory_edit" class="form-control" type="text" > <br>
+                磁盘（G） : <input id="disk_edit" class="form-control" type="text" > <br>
+                IP : <input id="ip_edit" class="form-control" type="text" > <br>
+                业务线 : <input id="business_edit" class="form-control" type="text" > <br>
+                备注 : <input id="remark_edit" class="form-control" type="text" > <br>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button id="edit_in" type="button" class="btn btn-primary">
+					确认修改
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+
+

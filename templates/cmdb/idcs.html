@@ -1,0 +1,192 @@
+
+{% extends 'base.html' %}
+<!-- Django 版本 {{ version }} -->
+{% block content %}
+
+    {% include 'cmdb/modal_idcs.html' %}
+
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active"> 机房</li>
+    </ol>
+
+
+    <div style="border: none; margin-top: 20px;border:0;">
+        <div class="col-lg-4" role="group" aria-label="...">
+            <button id="create_btn" type="button" class="btn btn-primary dropdown-toggle" style=" margin-left: 15px">注册机房</button>
+        </div>
+        <div class="col-lg-offset-4" style="width: 300px">
+            <div class="input-group">
+                <input id="search" type="text" class="form-control"  placeholder="Search for...">
+                <span class="input-group-btn">
+                <button  id="search_btn" class="btn btn-default"  style="width: 100px;" type="button">Go!</button>
+                </span>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+    </div>
+
+
+    <div class="panel panel-default" style="border: none">
+        <table class="table" ; style="margin-left: 30px ;margin-top: 20px">
+
+        <tr style="background-color: aqua">
+            <th>id</th>
+            <th>机房名</th>
+            <th>机柜数</th>
+            <th>地址</th>
+            <th>价格</th>
+            <th>备注</th>
+            <th>操作</th>
+        </tr>
+            {% for obj in paginator_data %}
+                <tr>
+                        <td><a href="/cmdb/idcs/{{ obj.id }}/">{{ obj.id }}</a></td>
+                        <td>{{ obj.name }}</td>
+                        <td>
+                        {% if  obj.rack.count  != 0 %}
+                            <a href="/cmdb/racks/?idc_id={{ obj.id }}">{{ obj.rack.count }}</a>
+                        {% else %}
+                            {{ obj.rack.count }}
+                        {% endif %}
+                        </td>
+                        <td>{{ obj.address }}</td>
+                        <td>{{ obj.price }}</td>
+                        <td>{{ obj.remark }}</td>
+                        <td><button class="delete_btn btn btn-warning dropdown-toggle" id="{{ obj.id }}" >删除</button>
+                        <button class="edit_btn btn btn-warning dropdown-toggle" id="{{ obj.id }}"  >修改</button>
+                        </td>
+
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+
+    <div style="margin-left: 30px">
+        {% if paginator_data.has_pervious %}
+            <a class="paginator" href='?page={{ paginator_data.pervious_page_number }}&search={{ search }}'><span>上一页</span></a>
+        {% endif %}
+
+        {% for page in  paginator_data.paginator.page_range%}
+            {% if paginator_data.number == page %}
+                <span id="current_page">{{ page }}</span>
+            {% else %}
+                <a class="paginator" href='?page={{ page }}&search={{ search }}' title='{{ page }}'><span>{{ page }}</span></a>
+            {% endif %}
+        {% endfor %}
+
+        {% if paginator_data.has_next %}
+            <a class="paginator" href='?page={{ paginator_data.next_page_number }}&search={{ search }}'><span>下一页</span></a>
+        {% endif %}
+
+    </div>
+
+
+
+      <!--jquery -->
+    <script >
+
+        //创建表单
+        $('#create_btn').click(function () {
+            $('#create_modal').modal()
+        })
+
+        $('#create_in').click(function () {
+            var name = $('#name').val()
+            var address = $('#address').val()
+            var price = $('#price').val()
+            var remark= $('#remake').val()
+
+            type = 'POST' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/idcs/'
+            data = {name:name,address:address,price:price,remark:remark}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(result){ // 后端返回的数据
+                    if (result.status == 1) {
+                        location.reload()
+                    }
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //删除表单数据
+        $('.delete_btn').click(function () {
+            var id = $(this).attr('id')
+            console.log(id)
+            type = 'DELETE' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/idcs/' + id
+            data = {}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(data){ // 后端返回的数据
+                    console.log(data)
+                    location.reload()
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //修改表单
+       $('.edit_btn').click(function () {
+            var id = $(this).parents('tr').children('td').eq(0).text()
+            var name = $(this).parents('tr').children('td').eq(1).text()
+            var address = $(this).parents('tr').children('td').eq(3).text()
+            var price = $(this).parents('tr').children('td').eq(4).text()
+            var remark = $(this).parents('tr').children('td').eq(5).text()
+            document.getElementById("id_edit").value =id
+            document.getElementById("name_edit").value =name
+            document.getElementById("address_edit").value =address
+            document.getElementById("price_edit").value =price
+            document.getElementById("remark_edit").value =remark
+            $('#edit_modal').modal()
+       })
+
+
+
+
+        $('#edit_in').click(function () {
+            var id = $('#id_edit').val()
+            var name = $('#name_edit').val()
+            var address = $('#address_edit').val()
+            var price= $('#price_edit').val()
+            var remark= $('#remark_edit').val()
+
+            type = 'PUT' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/idcs/' + id
+            console.log(url)
+            data = {name:name,address:address,price:price,remark:remark}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(data){ // 后端返回的数据
+                    console.log(data)
+                    location.reload()
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //search
+    $('#search_btn').click(function () {
+        var search = $('#search').val()
+        window.location.href = '/cmdb/idcs/?search='+search
+    })
+
+    </script>
+{% endblock %}

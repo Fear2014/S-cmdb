@@ -1,0 +1,232 @@
+
+{% extends 'base.html' %}
+<!-- Django 版本 {{ version }} -->
+{% block content %}
+
+    {% include 'cmdb/modal_server.html' %}
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active"> 主机</li>
+    </ol>
+    <div style="border: none; margin-top: 20px;border:0;">
+        <div class="col-lg-4" role="group" aria-label="...">
+            <button id="create_btn" type="button" class="btn btn-primary dropdown-toggle" style=" margin-left: 15px">注册主机</button>
+        </div>
+        <div class="col-lg-offset-4" style="width: 300px">
+            <div class="input-group">
+                <input id="search" type="text" class="form-control"  placeholder="Search for...">
+                <span class="input-group-btn">
+                <button  id="search_btn" class="btn btn-default"  style="width: 100px;" type="button">Go!</button>
+                </span>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+    </div>
+
+    <div class="panel panel-default" style="border: none">
+        <table class="table" ; style="margin-left: 30px ;margin-top: 20px">
+
+        <tr style="background-color: aqua">
+            <th>id</th>
+            <th>主机名</th>
+            <th>所属机柜</th>
+            <th>CPU</th>
+            <th>内存(M)</th>
+            <th>磁盘(G)</th>
+            <th>IP</th>
+            <th>业务线</th>
+            <th>状态</th>
+            <th>备注</th>
+            <th>采集信息</th>
+            <th>操作</th>
+        </tr>
+            {% for obj in paginator_data %}
+                <tr>
+                        <td>{{ obj.id }}</td>
+                        <td>{{ obj.name }}</td>
+                        <td>{{ obj.rack.name }}</td>
+                        <td>{{ obj.cpu }}</td>
+                        <td>{{ obj.memory }}</td>
+                        <td>{{ obj.disk }}</td>
+                        <td>{{ obj.ip }}</td>
+                        <td>{{ obj.business }}</td>
+                        <td>{{ obj.status }}</td>
+                        <td>{{ rack.remark }}</td>
+                        <td>{{ obj.daq }}</td>
+                        <td><button class="delete_btn btn btn-warning dropdown-toggle" id="{{ obj.id }}" >删除</button>
+                        <button class="edit_btn btn btn-warning dropdown-toggle" id="{{ obj.id }}"  >修改</button>
+                        </td>
+
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+
+    <div style="margin-left: 30px">
+        {% if paginator_data.has_pervious %}
+            <a class="paginator" href='?page={{ paginator_data.pervious_page_number }}&search={{ search }}'><span>上一页</span></a>
+        {% endif %}
+
+        {% for page in  paginator_data.paginator.page_range%}
+            {% if paginator_data.number == page %}
+                <span id="current_page">{{ page }}</span>
+            {% else %}
+                <a class="paginator" href='?page={{ page }}&search={{ search }}' title='{{ page }}'><span>{{ page }}</span></a>
+            {% endif %}
+        {% endfor %}
+
+        {% if paginator_data.has_next %}
+            <a class="paginator" href='?page={{ paginator_data.next_page_number }}&search={{ search }}'><span>下一页</span></a>
+        {% endif %}
+
+    </div>
+
+
+
+      <!--jquery -->
+    <script >
+        $.ajax({
+            type: 'GET',
+            url: '/cmdb/api_rack',
+            data: {}, // 前端传给后端的数据
+            dataType: "json",
+            success: function(result){ // 后端返回的数据
+                data = result.data
+                options = {}
+                for (obj of data) {
+                    option = '<option id=' + obj.id + '>' + obj.name + '</option>'
+                    options += option
+                }
+                $('#rack_id').append(options)
+            },
+            error: function(){
+                //显示错误信息
+            },
+         })
+
+
+        //创建表单
+        $('#create_btn').click(function () {
+            $('#create_modal').modal()
+        })
+
+        $('#create_in').click(function () {
+            var name = $('#name').val()
+            var rack_id = $('#rack_id option:selected').attr('id')
+            var cpu = $('#cpu').val()
+            var memory = $('#memory').val()
+            var disk = $('#disk').val()
+            var ip = $('#ip').val()
+            var business = $('#business').val()
+            var remark= $('#remake').val()
+
+            type = 'POST' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/servers/'
+            data = {name:name,rack_id:rack_id, cpu:cpu, memory:memory, disk:disk, ip:ip, business:business, remark:remark}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(result){ // 后端返回的数据
+                    if (result.status == 1) {
+                        location.reload()
+                    }
+                    else {
+                        console.log('创建失败')
+                    }
+
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //删除表单数据
+        $('.delete_btn').click(function () {
+            var id = $(this).attr('id')
+            type = 'DELETE' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/servers/' + id
+            data = {}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(data){ // 后端返回的数据
+                    console.log(data)
+                    location.reload()
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //修改表单
+       $('.edit_btn').click(function () {
+            var id = $(this).parents('tr').children('td').eq(0).text()
+            var name = $(this).parents('tr').children('td').eq(1).text()
+            var rack_id = $(this).parents('tr').children('td').eq(2).text()
+            var cpu = $(this).parents('tr').children('td').eq(3).text()
+            var memory = $(this).parents('tr').children('td').eq(4).text()
+            var disk = $(this).parents('tr').children('td').eq(4).text()
+            var ip = $(this).parents('tr').children('td').eq(4).text()
+            var business = $(this).parents('tr').children('td').eq(4).text()
+            var remark = $(this).parents('tr').children('td').eq(5).text()
+            options = document.getElementById('rack_id').options
+            $('#rack_id_edit').append(options)
+
+            document.getElementById("id_edit").value =id
+            document.getElementById("name_edit").value =name
+            document.getElementById("rack_id_edit").value =rack_id
+            document.getElementById("cpu_edit").value =cpu
+            document.getElementById("memory_edit").value =memory
+            document.getElementById("disk_edit").value =disk
+            document.getElementById("ip_edit").value =ip
+            document.getElementById("business_edit").value =business
+            document.getElementById("remark_edit").value =remark
+            $('#edit_modal').modal()
+       })
+
+
+
+
+        $('#edit_in').click(function () {
+            var id = $('#id_edit').val()
+            var name = $('#name_edit').val()
+            var rack_id = $('#rack_id_edit option:selected').attr('id')
+            var cpu= $('#cpu_edit').val()
+            var memory= $('#memory_edit').val()
+            var disk= $('#disk_edit').val()
+            var ip= $('#ip_edit').val()
+            var business= $('#business_edit').val()
+            var remark= $('#remark_edit').val()
+            console.log(rack_id)
+            type = 'PUT' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/servers/' + id
+            console.log(url)
+            data = {name:name,rack_id:rack_id, cpu:cpu, memory:memory, disk:disk, ip:ip, business:business, remark:remark}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(data){ // 后端返回的数据
+                    console.log(data)
+                    location.reload()
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //search
+    $('#search_btn').click(function () {
+        var search = $('#search').val()
+        window.location.href = '/cmdb/servers/?search='+search
+    })
+    </script>
+{% endblock %}

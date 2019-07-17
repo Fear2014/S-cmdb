@@ -1,0 +1,64 @@
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="create_modal"  select_options="" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					注册表
+				</h4>
+			</div>
+			<div class="modal-body">
+				机柜名 : <input id="name" class="form-control" type="text" > <br>
+                所属机房 : <select id="idc_id" class="form-control"></select> <br>
+                编号 : <input id="numb" class="form-control" type="text" > <br>
+                尺寸 : <input id="size" class="form-control" type="text" > <br>
+                备注 : <input id="remake" class="form-control" type="text" >
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button id="create_in" type="button" class="btn btn-primary">
+					注册
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					表单
+				</h4>
+			</div>
+			<div class="modal-body">
+                ID : <input id="id_edit" class="form-control" type="text" readonly="readonly"> <br>
+				机柜名 : <input id="name_edit" class="form-control" type="text" > <br>
+                所属机房 : <select id="idc_id_edit" class="form-control"></select> <br>
+                编号 : <input id="numb_edit" class="form-control" type="text" > <br>
+                尺寸 : <input id="size_edit" class="form-control" type="text" > <br>
+                备注 : <input id="remark_edit" class="form-control" type="text" >
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button id="edit_in" type="button" class="btn btn-primary">
+					确认修改
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+
+
