@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+<!-- Django 版本 {{ version }} -->
+{% block content %}
+
+    <section class="content-header">
+      <h1>
+        Dashboard
+        <small>Version 2.0</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="/dashboard/"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+      </ol>
+    </section>
+
+    <!--页首 -->
+    <div>
+        <section class="content">
+          <!-- Info boxes -->
+          <div class="row">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+              <div class="info-box">
+                <span class="info-box-icon bg-aqua"><i class="ion ion-ios-gear-outline"></i></span>
+
+                <div class="info-box-content">
+                  <span class="info-box-text">机房</span>
+                  <span class="info-box-number" style="font-size:50px" id="idcs_count"></span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+              <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+            <div class="col-md-4 col-sm-6 col-xs-12">
+              <div class="info-box">
+                <span class="info-box-icon bg-red"><i class="fa fa-google-plus"></i></span>
+
+                <div class="info-box-content">
+                  <span class="info-box-text">机柜</span>
+                  <span class="info-box-number" style="font-size:50px" id="racks_count"></span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+              <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+
+            <!-- fix for small devices only -->
+            <div class="clearfix visible-sm-block"></div>
+
+            <div class="col-md-4 col-sm-6 col-xs-12">
+              <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
+
+                <div class="info-box-content">
+                  <span class="info-box-text">主机</span>
+                  <span class="info-box-number" style="font-size:50px" id="servers_count"></span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+              <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+          </div>
+          <!-- /.row -->
+        </section>
+    </div>
+
+    <!--饼图 -->
+    <div class="col-md-6">
+        <div id="container" style="width: 550px; height: 400px; margin: 0 auto"></div>
+    </div>
+
+    <!--条形图 -->
+    <div class="col-md-6">
+        <p class="text-center">
+            <strong>机房可用性</strong>
+        </p>
+
+            <div class="progress-group" id="idc_tools" style="overflow: auto; max-height: 300px">
+
+            </div>
+          <!-- /.progress-group -->
+    </div>
+
+
+    <!--数据图 -->
+    <div class="box-footer">
+        <div class="row col-md-12">
+            <div class="col-sm-3 col-xs-6">
+                <div class="description-block border-right">
+                    <span class="description-percentage text-green"><i class="fa fa-caret-up"></i> 17%</span>
+                    <h5 class="description-header">$35,210.43</h5>
+                    <span class="description-text">TOTAL REVENUE</span>
+                </div>
+              <!-- /.description-block -->
+            </div>
+            <!-- /.col -->
+
+
+            <div class="col-sm-3 col-xs-6">
+                <div class="description-block border-right">
+                    <span class="description-percentage text-yellow"><i class="fa fa-caret-left"></i> 0%</span>
+                    <h5 class="description-header">$10,390.90</h5>
+                    <span class="description-text">TOTAL COST</span>
+                </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-sm-3 col-xs-6">
+                <div class="description-block border-right">
+                    <span class="description-percentage text-green"><i class="fa fa-caret-up"></i> 20%</span>
+                    <h5 class="description-header">$24,813.53</h5>
+                    <span class="description-text">TOTAL PROFIT</span>
+                </div>
+              <!-- /.description-block -->
+                </div>
+            <!-- /.col -->
+            <div class="col-sm-3 col-xs-6">
+                <div class="description-block">
+                    <span class="description-percentage text-red"><i class="fa fa-caret-down"></i> 18%</span>
+                    <h5 class="description-header">1200</h5>
+                <span class="description-text">GOAL COMPLETIONS</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script language="JavaScript">
+        function chart(chart_data) {
+            var chart = {
+               plotBackgroundColor: null,
+               plotBorderWidth: null,
+               plotShadow: false
+            };
+            var title = {
+              text: '各机房服务器占比'
+            };
+            var tooltip = {
+              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            };
+            var plotOptions = {
+              pie: {
+                 allowPointSelect: true,
+                 cursor: 'pointer',
+                 dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}%</b>: {point.percentage:.1f} %',
+                    style: {
+                       color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                 }
+              }
+            };
+            var series= chart_data;
+
+            var json = {};
+            json.chart = chart;
+            json.title = title;
+            json.tooltip = tooltip;
+            json.series = series;
+            json.plotOptions = plotOptions;
+            $('#container').highcharts(json);
+        }
+
+        function get_count() {
+            url ='/cmdb/api_count'
+            $.ajax({
+                type: "GET",
+                url: url,
+                data: {},
+                dataType: "json",
+                success: function (data) {
+                    console.log(data.count.idcs_count)
+                    $("#idcs_count").text(data.count.idcs_count)
+                    $("#racks_count").text(data.count.racks_count)
+                    $("#servers_count").text(data.count.servers_count)
+                    htmls = ""
+                    for (idc of data.total){
+                        html= '<span class="progress-text">'+idc.idc_name+'</span>\n' +
+                            '            <span class="progress-number"><b>'+idc.servers_numb+'</b>/'+idc.idc_rack_numb+'</span>\n' +
+                            '\n' +
+                            '            <div class="progress sm">\n' +
+                            '              <div class="progress-bar progress-bar-red" style="width: 80%"></div>\n' +
+                            '            </div>'
+                        htmls +=html
+                    }
+                    $('#idc_tools').html(htmls)
+                    chart_data = data.chart_datas
+                    chart(chart_data)
+                },
+                error: function () {
+
+                }
+            })
+        }
+
+        get_count()
+
+    </script>
+
+{% endblock %}

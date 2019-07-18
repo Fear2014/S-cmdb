@@ -20,6 +20,7 @@ from .views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^$', IndexPage.as_view()),
+    re_path(r'^dashboard/$', DashboardPage.as_view()),
     path('cmdb/', include('cmdb.urls')),
     path('account/', include('account.urls'))
 ]

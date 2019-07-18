@@ -6,3 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 class IndexPage(LoginRequiredMixin, TemplateView):
     template_name = 'index.html'
 
+
+class DashboardPage(LoginRequiredMixin, TemplateView):
+    template_name = 'dashboard.html'
+

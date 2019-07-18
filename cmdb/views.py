@@ -144,3 +144,37 @@ class ServerView(BaseListView):
         pk = kwargs.get('pk')
         self.model.objects.filter(id=pk).update(**data)
         return JsonResponse({'status': '0'})
+
+
+class ApiCount(View):
+
+    def get(self, request, *args, **kwargs):
+        idcs_count = Idc.objects.all().count()
+        racks_count = Rack.objects.all().count()
+        servers_count = Server.objects.all().count()
+        count = {
+            'idcs_count': idcs_count,
+            'racks_count': racks_count,
+            'servers_count': servers_count
+        }
+        total = []
+        idc_chart_datas = []
+        chart_datas = []     #饼图参数
+        for idc in Idc.objects.all():
+            servers_numb = 0
+            rack_numb = idc.IDC_RACK.count()
+            for rack in idc.IDC_RACK.all():
+                server_numb = rack.RACK_SEVER.count()
+                servers_numb += server_numb
+            res = {'idc_name': idc.name, 'idc_rack_numb': rack_numb*10, 'servers_numb':  servers_numb}
+            total.append(res)
+            idc_chart_data = [idc.name, servers_numb]
+            idc_chart_datas.append(idc_chart_data)
+        chart_datas.append({
+                  'type': 'pie',
+                  'name': 'Browser share',
+                  'data': idc_chart_datas
+                })
+        data = {'count':count, 'total':total, 'chart_datas': chart_datas}
+
+        return JsonResponse(data)
