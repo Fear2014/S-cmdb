@@ -62,24 +62,30 @@
     </div>
 
 
-    <div style="margin-left: 30px">
-        {% if paginator_data.has_pervious %}
-            <a class="paginator" href='?page={{ paginator_data.pervious_page_number }}&search={{ search }}'><span>上一页</span></a>
-        {% endif %}
+    <nav aria-label="Page navigation" style="margin-left: 30px; text-align: center;">
+        <ul class="pagination pagination-lg pager" style="display: inline-block;">
 
-        {% for page in  paginator_data.paginator.page_range%}
-            {% if paginator_data.number == page %}
-                <span id="current_page">{{ page }}</span>
-            {% else %}
-                <a class="paginator" href='?page={{ page }}&search={{ search }}' title='{{ page }}'><span>{{ page }}</span></a>
+            <li><a  href='?page=1&search={{ search }}'><span>首页</span></a></li>
+
+            {% if paginator_data.has_previous %}
+                <li><a  href='?page={{ paginator_data.previous_page_number }}&search={{ search }}'><span>上一页</span></a></li>
             {% endif %}
-        {% endfor %}
 
-        {% if paginator_data.has_next %}
-            <a class="paginator" href='?page={{ paginator_data.next_page_number }}&search={{ search }}'><span>下一页</span></a>
-        {% endif %}
+            {% for page in  paginator_data.paginator.page_range%}
+                {% if paginator_data.number == page %}
+                    <li><span  id="current_page">{{ page }}</span></li>
+                {% else %}
+                    <li><a  href='?page={{ page }}&search={{ search }}' title='{{ page }}'><span>{{ page }}</span></a></li>
+                {% endif %}
+            {% endfor %}
 
-    </div>
+            {% if paginator_data.has_next %}
+                <li><a  href='?page={{ paginator_data.next_page_number }}&search={{ search }}'><span>下一页</span></a></li>
+            {% endif %}
+
+            <li><a  href='?page={{ page_count }}&search={{ search }}'><span>末页</span></a></li>
+        </ul>
+    </nav>
 
 
 
