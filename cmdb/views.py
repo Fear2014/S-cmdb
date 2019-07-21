@@ -11,6 +11,25 @@ from utils.baseview import BaseListView
 from utils.wrappers import handle_data_check
 # Create your views here.
 
+class Reporting(View):
+    def post(self, request, *args, **kwargs):
+        get_data = QueryDict(request.body).dict()
+        print(get_data)
+        hostname = get_data.get('hostname')
+        cpu = get_data.get('server_cpu')
+        memory = get_data.get('server_mem')
+        disk = get_data.get('server_disk').split('\"')[1]
+        print(disk)
+        ip = eval(get_data.get('ipinfo'))[0].get('ip')
+        mac = eval(get_data.get('ipinfo'))[0].get('mac')
+        uuid = get_data.get('uuid')
+        server_type = get_data.get('server_type')
+        daq = {'mac': mac, 'manufacturers': mac+get_data.get('manufacturers'), 'st': get_data.get('st'), 'manufacture_date': get_data.get('manufacture_date'), 'os': get_data.get('os'), 'vm_status': get_data.get('vm_status')}
+        data = {'name': hostname, 'cpu': cpu, 'memory': memory, 'disk': disk, 'ip': ip, 'uuid': uuid, 'server_type': server_type, 'daq': daq}
+        Server.objects.create(**data)
+        return JsonResponse({})
+
+
 class ApiIdcs(LoginRequiredMixin, ListView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
@@ -115,7 +134,7 @@ class ApiRack(LoginRequiredMixin, View):
 class ServerView(BaseListView):
     model = Server
     template_name = 'cmdb/server.html'
-
+    template_detial = 'cmdb/server_detial.html'
     def get_queryset(self):
         queryset = self.model.objects.all().order_by('id')
         search = self.request.GET.get('search')

@@ -80,7 +80,11 @@ class Server(BaseModel):
             value = getattr(self, fild, None)
             res[fild] = value
         obj = getattr(self, 'rack')
-        res['rack'] = {'id': obj.id, 'name': obj.name } if obj else {}
+        daq1 = eval(self.daq) if self.daq else ''
+        print(type(daq1))
+        res['daq1'] = daq1
+        res['rack'] = {'id': obj.id, 'name': obj.name} if obj else {}
+        print(res)
         return res
 
 

@@ -23,4 +23,5 @@ urlpatterns = [
     re_path(r'api_rack/(?P<pk>\d+)?/?$', ApiRack.as_view()),
     re_path(r'servers/(?P<pk>\d+)?/?$', ServerView.as_view()),
     re_path(r'api_count/(?P<pk>\d+)?/?$', ApiCount.as_view()),
+    re_path(r'reporting/(?P<pk>\d+)?/?$', Reporting.as_view()),
 ]

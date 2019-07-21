@@ -30,7 +30,7 @@
             <th>主机名</th>
             <th>所属机柜</th>
             <th>CPU</th>
-            <th>内存(M)</th>
+            <th>内存(G)</th>
             <th>磁盘(G)</th>
             <th>IP</th>
             <th>业务线</th>
@@ -41,7 +41,7 @@
         </tr>
             {% for obj in paginator_data %}
                 <tr>
-                        <td>{{ obj.id }}</td>
+                        <td><a href="/cmdb/servers/{{ obj.id }}">{{ obj.id }}</a></td>
                         <td>{{ obj.name }}</td>
                         <td>{{ obj.rack.name }}</td>
                         <td>{{ obj.cpu }}</td>
@@ -51,7 +51,7 @@
                         <td>{{ obj.business }}</td>
                         <td>{{ obj.status }}</td>
                         <td>{{ rack.remark }}</td>
-                        <td>{{ obj.daq }}</td>
+                        <td><button class="btn btn-xs btn-info show" qad="{{ obj.daq }}" >采集信息</button></td>
                         <td><button class="delete_btn btn btn-warning dropdown-toggle" id="{{ obj.id }}" >删除</button>
                         <button class="edit_btn btn btn-warning dropdown-toggle" id="{{ obj.id }}"  >修改</button>
                         </td>
@@ -111,6 +111,26 @@
             },
          })
 
+        //qad
+        $('.show').click(function () {
+            var qad = $(this).attr('qad');
+            if (qad) {
+                //qad = {'mac': '00:0c:29:76:4f:1b'};
+                //console.log(qad);
+                qad = eval('(' + qad + ')')
+                //qad = JSON.parse(qad)
+            }
+            console.log(qad)
+            html = '<div>  <b> mac </b> :' + qad.mac + '</div><br>'+
+                    '<div>  <b> st </b> :' + qad.st + '</div><br>'+
+                    '<div>  <b> manufacture_date </b> :' + qad.manufacture_date + '</div><br>'+
+                    '<div>  <b> os </b> :' + qad.os + '</div><br>'+
+                    '<div>  <b> vm_status </b> :' + qad.vm_status + '</div><br>'+
+                    '<div>  <b> get_data </b> :' + qad.get_data + '</div><br>'
+            console.log(html)
+            $('#pad_content').html(html)
+            $('#qad_modal').modal()
+        })
 
         //创建表单
         $('#create_btn').click(function () {
@@ -244,5 +264,7 @@
         var search = $('#search').val()
         window.location.href = '/cmdb/servers/?search='+search
     })
+
+
     </script>
 {% endblock %}

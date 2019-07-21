@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 class BaseListView(LoginRequiredMixin, ListView):
     model = None
     template_detial = None
-    paginator_numb = 2
+    paginator_numb = 10
 
     def handle_page(self, queryset, page):
         paginator = Paginator(queryset, self.paginator_numb, 0)
@@ -26,6 +26,7 @@ class BaseListView(LoginRequiredMixin, ListView):
         #详情页
         if pk:
             paginator_data = self.model.objects.get(pk=pk)
+            print(paginator_data.to_dict)
             return render(request, self.template_detial, paginator_data.to_dict)
         #列表页
         queryset = self.get_queryset()
