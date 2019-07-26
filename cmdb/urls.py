@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,re_path
 from .views import *
+
 urlpatterns = [
     re_path(r'idcs/(?P<pk>\d+)?/?$', IdcView.as_view()),
     re_path(r'api_idc/(?P<pk>\d+)?/?$', ApiIdcs.as_view()),
