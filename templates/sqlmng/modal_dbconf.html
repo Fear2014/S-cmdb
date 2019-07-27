@@ -1,5 +1,5 @@
 <!-- 模态框（Modal） -->
-<div class="modal fade" id="create_modal"  select_options="" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="create_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -11,11 +11,13 @@
 				</h4>
 			</div>
 			<div class="modal-body">
-				机柜名 : <input id="name" class="form-control" type="text" > <br>
-                所属机房 : <select id="idc_id" class="form-control"></select> <br>
-                编号 : <input id="numb" class="form-control" type="text" > <br>
-                尺寸 : <input id="size" class="form-control" type="text" > <br>
-                备注 : <input id="remake" class="form-control" type="text" >
+                数据库名 : <input id="name" class="form-control" type="text" > <br>
+				用户名 : <input id="user" class="form-control" type="text" > <br>
+                密码 : <input id="password" class="form-control" type="text" > <br>
+                地址 : <input id="address" class="form-control" type="text" > <br>
+                端口 : <input id="port" class="form-control" type="text" > <br>
+                环境 : <select id="env" class="form-control" type="text" ><option id="1">测试</option><option id="2">生产</option></select>  <br>
+                备注 : <input id="remark" class="form-control" type="text" >
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
@@ -43,10 +45,12 @@
 			</div>
 			<div class="modal-body">
                 ID : <input id="id_edit" class="form-control" type="text" readonly="readonly"> <br>
-				机柜名 : <input id="name_edit" class="form-control" type="text" > <br>
-                所属机房 : <select id="idc_id_edit" class="form-control"></select> <br>
-                编号 : <input id="numb_edit" class="form-control" type="text" > <br>
-                尺寸 : <input id="size_edit" class="form-control" type="text" > <br>
+                数据库名 : <input id="name_edit" class="form-control" type="text" > <br>
+				用户名 : <input id="user_edit" class="form-control" type="text" > <br>
+                密码 : <input id="password_edit" class="form-control" type="text" > <br>
+                地址 : <input id="address_edit" class="form-control" type="text" > <br>
+                端口 : <input id="port_edit" class="form-control" type="text" > <br>
+                环境 : <select id="env_edit" class="form-control" type="text"  > <option id="1">测试</option><option id="2">生产</option></select><br>
                 备注 : <input id="remark_edit" class="form-control" type="text" >
 			</div>
 			<div class="modal-footer">

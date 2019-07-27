@@ -45,7 +45,6 @@ class BaseListView(LoginRequiredMixin, ListView):
         #详情页
         if pk:
             paginator_data = self.model.objects.get(pk=pk)
-            print(paginator_data.to_dict)
             return render(request, self.template_detial, paginator_data.to_dict)
         #列表页
         queryset = self.get_queryset()

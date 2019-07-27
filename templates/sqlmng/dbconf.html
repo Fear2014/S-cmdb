@@ -3,17 +3,17 @@
 <!-- Django 版本 {{ version }} -->
 {% block content %}
 
-    {% include 'cmdb/modal_idcs.html' %}
+    {% include 'sqlmng/modal_dbconf.html' %}
 
     <ol class="breadcrumb">
         <li><a href="/dashboard/"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active"> 机房</li>
+        <li class="active"> 数据库</li>
     </ol>
 
 
     <div style="border: none; margin-top: 20px;border:0;">
         <div class="col-lg-4" role="group" aria-label="...">
-            <button id="create_btn" type="button" class="btn btn-primary dropdown-toggle" style=" margin-left: 15px">注册机房</button>
+            <button id="create_btn" type="button" class="btn btn-primary dropdown-toggle" style=" margin-left: 15px">注册数据库</button>
         </div>
         <div class="col-lg-offset-4" style="width: 300px">
             <div class="input-group">
@@ -31,10 +31,12 @@
 
         <tr style="background-color: aqua">
             <th>id</th>
-            <th>机房名</th>
-            <th>机柜数</th>
+            <th>数据库名</th>
+            <th>用户</th>
+            <th>密码</th>
             <th>地址</th>
-            <th>价格</th>
+            <th>端口</th>
+            <th>环境</th>
             <th>备注</th>
             <th>操作</th>
         </tr>
@@ -42,15 +44,11 @@
                 <tr>
                         <td><a href="/cmdb/idcs/{{ obj.id }}/">{{ obj.id }}</a></td>
                         <td>{{ obj.name }}</td>
-                        <td>
-                        {% if  obj.rack.count  != 0 %}
-                            <a href="/cmdb/racks/?idc_id={{ obj.id }}">{{ obj.rack.count }}</a>
-                        {% else %}
-                            {{ obj.rack.count }}
-                        {% endif %}
-                        </td>
+                        <td>{{ obj.user }} </td>
+                        <td>{{ obj.password }}</td>
                         <td>{{ obj.address }}</td>
-                        <td>{{ obj.price }}</td>
+                        <td>{{ obj.port }}</td>
+                        <td>{{ obj.env_name }}</td>
                         <td>{{ obj.remark }}</td>
                         <td><button class="delete_btn btn btn-warning dropdown-toggle" id="{{ obj.id }}" >删除</button>
                         <button class="edit_btn btn btn-warning dropdown-toggle" id="{{ obj.id }}"  >修改</button>
@@ -99,13 +97,16 @@
 
         $('#create_in').click(function () {
             var name = $('#name').val()
+            var user = $('#user').val()
+            var password = $('#password').val()
             var address = $('#address').val()
-            var price = $('#price').val()
+            var port = $('#port').val()
+            var env = $('#env option:selected').attr('id')
             var remark= $('#remake').val()
 
             type = 'POST' // GET,POST,DELETE,PUT, ...
-            url = '/cmdb/idcs/'
-            data = {name:name,address:address,price:price,remark:remark}
+            url = '/sqlmng/dbconf/'
+            data = {name:name,user:user,password:password,address:address,port:port,env:env,remark:remark}
             $.ajax({
                 type: type,
                 url: url,
@@ -133,7 +134,7 @@
             var id = $(this).attr('id').trim()
             console.log(id)
             type = 'DELETE' // GET,POST,DELETE,PUT, ...
-            url = '/cmdb/idcs/' + id
+            url = '/sqlmng/dbconf/' + id
             data = {}
             $.ajax({
                 type: type,
@@ -154,14 +155,20 @@
        $('.edit_btn').click(function () {
             var id = $(this).parents('tr').children('td').eq(0).text().trim()
             var name = $(this).parents('tr').children('td').eq(1).text()
-            var address = $(this).parents('tr').children('td').eq(3).text()
-            var price = $(this).parents('tr').children('td').eq(4).text()
-            var remark = $(this).parents('tr').children('td').eq(5).text()
+            var user = $(this).parents('tr').children('td').eq(2).text()
+            var password = $(this).parents('tr').children('td').eq(3).text()
+            var address = $(this).parents('tr').children('td').eq(4).text()
+            var port = $(this).parents('tr').children('td').eq(5).text()
+            var env = $(this).parents('tr').children('td').eq(6).text()
+            var remark = $(this).parents('tr').children('td').eq(7).text()
             console.log(remark)
             document.getElementById("id_edit").value =id
             document.getElementById("name_edit").value =name
+            document.getElementById("user_edit").value =user
+            document.getElementById("password_edit").value =password
             document.getElementById("address_edit").value =address
-            document.getElementById("price_edit").value =price
+            document.getElementById("port_edit").value =port
+            document.getElementById("env_edit").value =env
             document.getElementById("remark_edit").value =remark
             $('#edit_modal').modal()
        })
@@ -172,14 +179,17 @@
         $('#edit_in').click(function () {
             var id = $('#id_edit').val().trim()
             var name = $('#name_edit').val()
+            var user = $('#user_edit').val()
+            var password = $('#password_edit').val()
             var address = $('#address_edit').val()
-            var price= $('#price_edit').val()
+            var port = $('#port_edit').val()
+            var env = $('#env_edit option:selected').attr('id')
             var remark= $('#remark_edit').val()
 
             type = 'PUT' // GET,POST,DELETE,PUT, ...
-            url = '/cmdb/idcs/' + id
+            url = '/sqlmng/dbconf/' + id
             console.log(url)
-            data = {name:name,address:address,price:price,remark:remark}
+            data = {name:name,user:user,password:password,address:address,port:port,env:env,remark:remark}
             $.ajax({
                 type: type,
                 url: url,
@@ -205,7 +215,7 @@
     //search
     $('#search_btn').click(function () {
         var search = $('#search').val()
-        window.location.href = '/cmdb/idcs/?search='+search
+        window.location.href = '/sqlmng/dbconf/?search='+search
     })
 
     </script>

@@ -22,5 +22,6 @@ urlpatterns = [
     re_path(r'^$', IndexPage.as_view()),
     re_path(r'^dashboard/$', DashboardPage.as_view()),
     path('cmdb/', include('cmdb.urls')),
-    path('account/', include('account.urls'))
+    path('account/', include('account.urls')),
+    path('sqlmng/', include('sqlmng.urls')),
 ]

@@ -1,18 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
-# Create your models here.
-class BaseModel(models.Model):
-    name = models.CharField(max_length=32)
-    remark = models.TextField()
-
-    class Meta:
-        abstract = True
-        ordering = ['id']
-        unique_together = ('name',)
+from utils.basemodel import BaseModel
 
 class Idc(BaseModel):
     address = models.CharField(max_length=100)
-    price = models.CharField(max_length=64,null=True,blank=True,default='0')
+    price = models.CharField(max_length=64, null=True, blank=True, default='0')
 
     @property
     def name_handle(self):
@@ -81,10 +73,8 @@ class Server(BaseModel):
             res[fild] = value
         obj = getattr(self, 'rack')
         daq1 = eval(self.daq) if self.daq else ''
-        print(type(daq1))
         res['daq1'] = daq1
         res['rack'] = {'id': obj.id, 'name': obj.name} if obj else {}
-        print(res)
         return res
 
 
