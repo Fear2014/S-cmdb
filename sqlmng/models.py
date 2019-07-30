@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from account.models import User
 from utils.basemodel import BaseModel
 
 class DBConf(BaseModel):
@@ -27,6 +28,28 @@ class DBConf(BaseModel):
         else:
             res['env_name'] = ''
         return res
+
+
+class InpectionSql(BaseModel):
+    STATUS = {
+        (-3, u'回滚失败'),
+        (-2, u'回滚成功'),
+        (-1, u'待执行'),
+        (0, u'执行成功'),
+        (1, u'已放弃'),
+        (2, u'执行失败'),
+    }
+    sql_user = models.ManyToManyField(User)
+    commiter = models.CharField(max_length=128)
+    sql_conent = models.TextField()
+    env = models.CharField(max_length=16)
+    db_name = models.CharField(max_length=48)
+    treater = models.CharField(max_length=128)
+    status = models.IntegerField(choices=STATUS)
+    exe_affected_rows = models.CharField(max_length=32)
+    rollback_id = models.CharField(max_length=128)
+    rollback_db = models.CharField(max_length=128)
+
 
 
 
