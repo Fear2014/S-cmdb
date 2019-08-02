@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
+    {% include 'sqlmng/modal_inception.html' %}
     <ol class="breadcrumb">
         <li><a href="/dashboard/"><i class="fa fa-dashboard"></i> Home</a></li>
         <li class="active"> Sql审核</li>
@@ -60,7 +60,7 @@
                 <i class="icon-ok bigger-110"></i>
                 提交
             </button>
-            <button style="margin-top:20px; margin-left:15%" class="btn reset">
+            <button  id="clear" style="margin-top:20px; margin-left:15%" class="btn reset">
                 <i class="icon-undo bigger-110"></i>
                 清空
             </button>
@@ -71,7 +71,7 @@
     </div>
 
     <script>
-
+    //根据申请人和环境判断审核人
     $('.ace').change(function () {
         var env = $('input[name="form-field-radio"]').filter(':checked').val()
         data = {'env': env}
@@ -84,14 +84,20 @@
                 $('#db_name').empty()
                 $('#treater').empty()
                 options = ''
+                user_options = ''
                 for (data of result.data ){
                     option = '<option>' + data.name + '</option>'
                     options += option
                 }
                 $('#db_name').append(options)
-                user = result.user
-                user_option= '<option>' + user + '</option>'
-                $('#treater').append(user_option)
+                users = result.user
+                console.log(users)
+                for (user of users) {
+                    user_option = '<option>' + user + '</option>'
+                    user_options += user_option
+                    console.log(user_options)
+                }
+                $('#treater').append(user_options)
             },
             error: function () {
 
@@ -99,7 +105,7 @@
         })
     })
 
-
+    //提交按钮
     $('#check').click(function () {
         var env = $('input[name="form-field-radio"]').filter(':checked').val()
         var sql_conent = $('#sql_content').val()
@@ -107,13 +113,27 @@
         var remark = $('#remark').val()
         var treater = $('#treater option:selected').val()
         data = {'env':env, 'sql_conent': sql_conent, 'db_name': db_name, 'treater': treater, 'remark': remark}
-        console.log(data)
         $.ajax({
             type: 'POST',
-            url: '/sqlmng/inecption_check/',
+            url: '/sqlmng/inception_check/',
             data: data,
             dataType: 'json',
-            success: function () {
+            success: function (res) {
+                console.log(res)
+                status = res.status
+                result = res.result
+                if (status == 0){
+                    htmls ='<b>提交成功 </b>'
+                    $('#sql_error_detial').html(htmls)
+                    $('#sql_error_modal').modal()
+                    $('#sql_content').val('')
+                    $('#remark').val('')
+                }
+                if (status == 1){
+                    htmls ='<b>'+ result + '</b>'
+                    $('#sql_error_detial').html(htmls)
+                    $('#sql_error_modal').modal()
+                }
 
             },
             error: function () {
@@ -123,5 +143,10 @@
         })
     })
 
+    //清空按钮
+    $('#clear').click(function () {
+        $('#sql_content').val('')
+        $('#remark').val('')
+    })
     </script>
 {% endblock %}

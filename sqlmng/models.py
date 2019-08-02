@@ -30,7 +30,7 @@ class DBConf(BaseModel):
         return res
 
 
-class InpectionSql(BaseModel):
+class InpectionSql(models.Model):
     STATUS = {
         (-3, u'回滚失败'),
         (-2, u'回滚成功'),
@@ -45,12 +45,22 @@ class InpectionSql(BaseModel):
     env = models.CharField(max_length=16)
     db_name = models.CharField(max_length=48)
     treater = models.CharField(max_length=128)
-    status = models.IntegerField(choices=STATUS)
+    status = models.IntegerField(choices=STATUS, default='-1')
     exe_affected_rows = models.CharField(max_length=32)
     rollback_id = models.CharField(max_length=128)
     rollback_db = models.CharField(max_length=128)
+    createtime = models.DateTimeField(auto_now_add=True)
+    updatetime = models.DateTimeField(auto_now=True)
+    remark = models.TextField()
 
-
+    @property
+    def to_dict(self):
+        res = {}
+        filds = [f.name for f in self._meta.fields]
+        for fild in filds:
+            value = getattr(self, fild, None)
+            res[fild] = value
+        return res
 
 
 def __str__(self):

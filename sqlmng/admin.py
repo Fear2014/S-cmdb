@@ -5,3 +5,4 @@ from .models import *
 
 
 admin.site.register(DBConf)
+admin.site.register(InpectionSql)

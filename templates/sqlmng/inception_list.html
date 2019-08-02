@@ -1,0 +1,307 @@
+
+{% extends 'base.html' %}
+<!-- Django 版本 {{ version }} -->
+{% block content %}
+
+    {% include 'sqlmng/modal_inception.html' %}
+    <ol class="breadcrumb">
+        <li><a href="/dashboard/"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active"> Sql处理清单</li>
+    </ol>
+    <div style="border: none; margin-top: 20px;border:0;">
+        <div class="col-lg-offset-4" style="width: 300px">
+            <div class="input-group">
+                <input id="search" type="text" class="form-control"  placeholder="Search for...">
+                <span class="input-group-btn">
+                <button  id="search_btn" class="btn btn-default"  style="width: 100px;" type="button">Go!</button>
+                </span>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+    </div>
+
+    <div class="panel panel-default" style="border: none">
+        <table class="table" ; style="margin-left: 30px ;margin-top: 20px">
+
+        <tr style="background-color: aqua">
+            <th>id</th>
+            <th>提交时间</th>
+            <th>提交人</th>
+            <th>Sql语句</th>
+            <th>语法检查</th>
+            <th>环境</th>
+            <th>数据库</th>
+            <th>执行人</th>
+            <th>状态</th>
+            <th>备注</th>
+            <th>操作</th>
+        </tr>
+            {% for obj in paginator_data %}
+                <tr>
+                    <td>{{ obj.id }}</td>
+                    <td>{{ obj.createtime|date:"Y-m-d H:i:s "}}</td>
+                    <td>{{ obj.commiter }}</td>
+                    <td>{{ obj.sql_conent|slice:"30" }}...<button  sql_detial="{{ obj.sql_conent }}" type="button" class="btn btn-info btn-sm sql_btn">详情</button> </td>
+                    <td>审核通过</td>
+                    <td>{{ obj.env }}</td>
+                    <td>{{ obj.db_name }}</td>
+                    <td>{{ obj.treater }}</td>
+                    {% if obj.status == -3 %} <td><img src="/static/imgs/images/excutefail.png">回滚失败</td> {% endif %}
+                    {% if obj.status == -2 %} <td><img src="/static/imgs/images/rollback.gif">回滚成功</td> {% endif %}
+                    {% if obj.status == -1 %} <td ><img src="/static/imgs/images/forexcute.png">待执行</td> {% endif %}
+                    {% if obj.status == 0 %} <td><img src="/static/imgs/images/excuted.png">执行成功</td> {% endif %}
+                    {% if obj.status == 1 %} <td><img src="/static/imgs/images/canceled.png">已放弃</td> {% endif %}
+                    {% if obj.status == 2 %} <td><img src="/static/imgs/images/excutefail.png">执行失败</td> {% endif %}
+                    <td>{{ rack.remark }}</td>
+                    <td><div class="btn-group">
+                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Action <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                            <li><a href="#">执行</a></li>
+                            <li><a href="#" sqlip="{{ obj.id }}" class="cancle" >放弃</a></li>
+                            </ul>
+                        </div>
+                    </td>
+
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+
+    <nav aria-label="Page navigation" style="margin-left: 30px; text-align: center;">
+        <ul class="pagination pagination-lg pager" style="display: inline-block;">
+
+            <li><a  href='?page=1&search={{ search }}'><span>首页</span></a></li>
+
+            {% if paginator_data.has_previous %}
+                <li><a  href='?page={{ paginator_data.previous_page_number }}&search={{ search }}'><span>上一页</span></a></li>
+            {% endif %}
+
+            {% for page in  paginator_data.paginator.page_range%}
+                {% if paginator_data.number == page %}
+                    <li><span  id="current_page">{{ page }}</span></li>
+                {% else %}
+                    <li><a  href='?page={{ page }}&search={{ search }}' title='{{ page }}'><span>{{ page }}</span></a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if paginator_data.has_next %}
+                <li><a  href='?page={{ paginator_data.next_page_number }}&search={{ search }}'><span>下一页</span></a></li>
+            {% endif %}
+
+            <li><a  href='?page={{ page_count }}&search={{ search }}'><span>末页</span></a></li>
+        </ul>
+    </nav>
+
+
+
+
+      <!--jquery -->
+    <script >
+        //获取sql语句详情
+        $('.sql_btn').click(function () {
+            var sql_conent = $(this).attr('sql_detial')
+            sql_html = '<b>'+ sql_conent + '</b>'
+            $('#sql_conent_detial').html(sql_html)
+            $('#sql_content_modal').modal()
+        })
+
+        //取消执行
+        $('.cancle').click(function () {
+            var id = $(this).attr('sqlip')
+            $.ajax({
+                type: 'GET' ,
+                url: '/sqlmng/Api_Cancel/' + id ,
+                data: {} ,
+                dataType: 'json',
+                success: function () {
+                    location.reload()
+                } ,
+                error: function () {
+                    
+                }
+            })
+        })
+
+
+
+
+
+
+        $.ajax({
+            type: 'GET',
+            url: '/cmdb/api_rack',
+            data: {}, // 前端传给后端的数据
+            dataType: "json",
+            success: function(result){ // 后端返回的数据
+                data = result.data
+                options = {}
+                for (obj of data) {
+                    option = '<option id=' + obj.id + '>' + obj.name + '</option>'
+                    options += option
+                }
+                $('#rack_id').append(options)
+            },
+            error: function(){
+                //显示错误信息
+            },
+         })
+
+        //qad
+        $('.show').click(function () {
+            var qad = $(this).attr('qad');
+            if (qad) {
+                //qad = {'mac': '00:0c:29:76:4f:1b'};
+                //console.log(qad);
+                qad = eval('(' + qad + ')')
+                //qad = JSON.parse(qad)
+            }
+            console.log(qad)
+            html = '<div>  <b> mac </b> :' + qad.mac + '</div><br>'+
+                    '<div>  <b> st </b> :' + qad.st + '</div><br>'+
+                    '<div>  <b> manufacture_date </b> :' + qad.manufacture_date + '</div><br>'+
+                    '<div>  <b> os </b> :' + qad.os + '</div><br>'+
+                    '<div>  <b> vm_status </b> :' + qad.vm_status + '</div><br>'+
+                    '<div>  <b> get_data </b> :' + qad.get_data + '</div><br>'
+            console.log(html)
+            $('#pad_content').html(html)
+            $('#qad_modal').modal()
+        })
+
+        //创建表单
+        $('#create_btn').click(function () {
+            $('#create_modal').modal()
+        })
+
+        $('#create_in').click(function () {
+            var name = $('#name').val()
+            var rack_id = $('#rack_id option:selected').attr('id').trim()
+            var cpu = $('#cpu').val()
+            var memory = $('#memory').val()
+            var disk = $('#disk').val()
+            var ip = $('#ip').val()
+            var business = $('#business').val()
+            var remark= $('#remake').val()
+
+            type = 'POST' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/servers/'
+            data = {name:name,rack_id:rack_id, cpu:cpu, memory:memory, disk:disk, ip:ip, business:business, remark:remark}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(result){ // 后端返回的数据
+                    if (result.status == 0) {
+                        location.reload()
+                    }
+                    else if (result.status == 1){
+                        alert('请勿重复创建')
+                    }
+                    else {
+                        alert('系统错误')
+                    }
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //删除表单数据
+        $('.delete_btn').click(function () {
+            var id = $(this).attr('id').trim()
+            type = 'DELETE' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/servers/' + id
+            data = {}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(data){ // 后端返回的数据
+                    console.log(data)
+                    location.reload()
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //修改表单
+       $('.edit_btn').click(function () {
+            var id = $(this).parents('tr').children('td').eq(0).text().trim()
+            var name = $(this).parents('tr').children('td').eq(1).text()
+            var rack_id = $(this).parents('tr').children('td').eq(2).text().trim()
+            var cpu = $(this).parents('tr').children('td').eq(3).text()
+            var memory = $(this).parents('tr').children('td').eq(4).text()
+            var disk = $(this).parents('tr').children('td').eq(4).text()
+            var ip = $(this).parents('tr').children('td').eq(4).text()
+            var business = $(this).parents('tr').children('td').eq(4).text()
+            var remark = $(this).parents('tr').children('td').eq(5).text()
+            options = document.getElementById('rack_id').options
+            $('#rack_id_edit').append(options)
+
+            document.getElementById("id_edit").value =id
+            document.getElementById("name_edit").value =name
+            document.getElementById("rack_id_edit").value =rack_id
+            document.getElementById("cpu_edit").value =cpu
+            document.getElementById("memory_edit").value =memory
+            document.getElementById("disk_edit").value =disk
+            document.getElementById("ip_edit").value =ip
+            document.getElementById("business_edit").value =business
+            document.getElementById("remark_edit").value =remark
+            $('#edit_modal').modal()
+       })
+
+
+
+
+        $('#edit_in').click(function () {
+            var id = $('#id_edit').val().trim()
+            var name = $('#name_edit').val()
+            var rack_id = $('#rack_id_edit option:selected').attr('id').trim()
+            var cpu= $('#cpu_edit').val()
+            var memory= $('#memory_edit').val()
+            var disk= $('#disk_edit').val()
+            var ip= $('#ip_edit').val()
+            var business= $('#business_edit').val()
+            var remark= $('#remark_edit').val()
+            console.log(rack_id)
+            type = 'PUT' // GET,POST,DELETE,PUT, ...
+            url = '/cmdb/servers/' + id
+            console.log(url)
+            data = {name:name,rack_id:rack_id, cpu:cpu, memory:memory, disk:disk, ip:ip, business:business, remark:remark}
+            $.ajax({
+                type: type,
+                url: url,
+                data: data, // 前端传给后端的数据
+                dataType: "json",
+                success: function(data){ // 后端返回的数据
+                    if (data.status == 0){
+                        location.reload()
+                    }
+                    else if (data.status == 1){
+                        alert('名称重复')
+                    }
+                    else {
+                        alert('系统错误')
+                    }
+                },
+                error: function(){
+                    //显示错误信息
+                },
+             })
+         })
+
+    //search
+    $('#search_btn').click(function () {
+        var search = $('#search').val()
+        window.location.href = '/sqlmng/inception_list/?search='+search
+    })
+
+
+    </script>
+{% endblock %}
